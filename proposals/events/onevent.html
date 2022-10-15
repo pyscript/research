@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://pyscript.net/unstable/pyscript.css" />
+    <script defer src="https://pyscript.net/unstable/pyscript.js"></script>
+    <script>
+        // >> in pyscript
+        window.set_value = (target, name, value) => {
+            target[name]=value;
+        }
+        window.get_value = (target, name) => {
+            return target[name];
+        }
+        window.py = new Proxy(
+            {
+                get:get_value,
+                set:set_value
+            },
+            {
+                get: function(target, prop, receiver) {
+                    if(target.handlers !== window.handlers){
+                        target.handlers = window.handlers
+                    }
+                    if( prop in target ){
+                        return Reflect.get(...arguments);
+                    }
+                    if( prop in target.handlers ){
+                        return target.handlers[prop]
+                    }else{
+                        throw new Error("No handler exists")
+                    }
+                }
+            }
+        )
+        // << in pyscript
+    </script>
+</head>
+<body style="padding:2em;">
+    <button onclick="py.foo()">call foo on click</button><br><br>
+    <button onclick="py.boo(event)">call boo on click w event</button><br><br>
+    <button onclick="py.loo(event, 123)">call loo on click w event + 123</button><br><br>
+    <button onclick="py.nothing(event)">call nothing on click w event</button><br><br>
+    <button id="empty_button">empty_button with mousemove event</button><br><br>
+    <py-script>
+## >> pyscript
+import js
+from pyodide.ffi import create_proxy
+
+def handler(_func=None, *, event=None, element=js.document, options=None):
+    if not js.hasOwnProperty("handlers"):
+        js.handlers = js.Object.new()
+    
+    def decorator(func):
+        proxy = create_proxy(func)
+        js.set_value(js.handlers, func.__name__, proxy)
+        if event:
+            element.addEventListener( event, proxy, options )
+        return func
+
+    # just @handler( None, **kargs )
+    if _func is None:
+        return decorator
+    
+    # just @handler
+    else:
+        js.set_value(js.handlers, _func.__name__, create_proxy(_func))
+        return _func
+
+## << in pyscript
+
+@handler
+def foo():
+    js.console.log("foo called")
+
+@handler
+def boo(e):
+    js.console.log("boo called with event")
+    js.console.log( e )
+
+@handler
+def loo(*e):
+    js.console.log("loo called with *event")
+    js.console.log( e[0] )
+    js.console.log( e[1] )
+
+@handler(event="click")
+def doc_click(*e):
+    js.console.log("doc_click called with *event")
+    js.console.log( e[0] )
+
+@handler( event="mousemove", element=Element("empty_button").element )
+def button_mousemove(*e):
+    js.console.log("button_mousemove called with *event")
+    js.console.log( e[0] )
+
+    </py-script>
+</body>
+</html>

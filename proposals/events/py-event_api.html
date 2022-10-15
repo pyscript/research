@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyEvent API</title>
+</head>
+<body>
+    <div py-mousemove="move">py-mousemove</div>
+    <div py-click="click(1,2,3,event)">py-click</div>
+    <div py-dragover="dragover(event)" py-dragout="dragout(event)">py-dragover and py-dragout</div>
+</body>
+
+<py-script>
+    import js
+
+    @handler
+    dev move(e):
+        js.console.log(e)
+
+    @handler
+    dev click(a,b,c,e):
+        js.console.log(e)
+
+    @handler
+    dev dragover(e):
+        js.console.log(e)
+
+    @handler
+    dev dragout(e):
+        js.console.log(e)
+</py-script>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutation Observer</title>
+    <script>
+        //collect py- attributes
+        function attr_walk( nodes ){
+            for (let node of nodes) {
+                if( node.attributes ){
+                    for (const attr of node.attributes) {
+                        if( attr.name.startsWith("py-")){
+                            observe(node,attr.name )
+                        }
+                    }
+                }
+                if( node.hasChildNodes()){
+                    attr_walk(node.childNodes)
+                }
+            }
+        }
+        
+        // process existing dom at domcontentloaded
+        document.addEventListener("DOMContentLoaded", ()=>{
+            attr_walk(document.body.childNodes)
+        });
+
+        // mutation observer
+        new MutationObserver((mutationList, observer) => {
+            for (const mutation of mutationList) {
+                if (mutation.type === 'attributes' && mutation.attributeName.startsWith("py-")) {
+                    observe(mutation.target,mutation.attributeName )
+                }
+            }
+        }).observe(
+            document,
+            { attributes: true, childList: false, subtree: true }
+        );
+
+        //called when attributes are discovered or mutated
+        function observe(node, name){
+            if( node.hasAttribute(name) ){
+                console.log( "add" , node, name, node.getAttribute(name) )
+            }else{
+                console.log( "rem" , node, name, node.getAttribute(name) )
+            }
+        }
+     </script>
+</head>
+<body>
+    <div py-mousemove="0">Hello</div>
+    <div><div>Hello</div></div>
+    <div><div py-click="1"><div>Hello</div></div></div>
+    <div><div><div><div py-dragover="2" py-dragout="3">Hello</div></div></div></div>
+    <div><div py-click="4"><div py-click="5"><div><div py-click="6">Hello</div></div></div></div></div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://pyscript.net/unstable/pyscript.css" />
+    <script defer src="https://pyscript.net/unstable/pyscript.js"></script>
+    <script>
+        // >> in pyscript
+        window.set_value = (target, name, value) => {
+            target[name]=value;
+        }
+        window.get_value = (target, name) => {
+            return target[name];
+        }
+        window.py = new Proxy(
+            {
+                get:get_value,
+                set:set_value
+            },
+            {
+                get: function(target, prop, receiver) {
+                    if(target.handlers !== window.handlers){
+                        target.handlers = window.handlers
+                    }
+                    if( prop in target ){
+                        return Reflect.get(...arguments);
+                    }
+                    if( prop in target.handlers ){
+                        return target.handlers[prop]
+                    }else{
+                        throw new Error("No handler exists")
+                    }
+                }
+            }
+        )
+    </script>
+</head>
+<body style="padding:2em;">
+<py-config>
+paths = ["./pyscript_handler.py"]
+</py-config>
+    <button onclick="py.foo()">call foo on click</button><br><br>
+    <button onclick="py.boo(event)">call boo on click w event</button><br><br>
+    <button onclick="py.loo(event, 123)">call loo on click w event + 123</button><br><br>
+    <button onclick="py.nothing(event)">call nothing on click w event</button><br><br>
+    <button id="empty_button">empty_button with mousemove event</button><br><br>
+    <py-script src="app.py"></py-script>
+</body>
+</html>

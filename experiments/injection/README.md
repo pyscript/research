@@ -1,6 +1,6 @@
 # Handler DI
 
-Let handler functions
+Give handler functions a more Pythonic function signature.
 
 ## The Problem
 
@@ -28,7 +28,7 @@ def update_todo_status(e):
 
 ```
 @handler(event="mousemove", element=Element("empty_button").element )
-def update_todo_status(targetId: str, targetValue: int):
+def update_todo_status(target_id: str, target_value: int):
     todo_id = e.target.getAttribute("id")
     todo_input_value = int(e.target.value)
     update_todo(todo_id, todo_input_value)
@@ -44,7 +44,7 @@ If the person provided a type hint on the function parameter, PyScript would try
 What if you liked this, but wanted something off the event PyScript didn't provide?
 What if the type coercion wasn't quite right?
 What if people wanted to ship some really cool mediator stuff?
-We could use either descriptors, generics, or `Annotated`, as is being done in Textual and other systems:
+We could use either descriptors, generics, or `Annotated`, as being done in Textual and other systems:
 
 ```
 @handler(event="mousemove", element=Element("empty_button").element )

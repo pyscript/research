@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://pyscript.net/unstable/pyscript.css"/>
+    <script defer src="https://pyscript.net/unstable/pyscript.js"></script>
+    <script src="pyscript_handler.js"></script>
+</head>
+<body style="padding:2em;">
+<py-config>
+    paths = ["./pyscript_handler.py"]
+</py-config>
+<div>
+    <button id="btn1" onclick="py.foo">call foo on click</button>
+</div>
+<div>
+    <label for="input1">Counter</label>
+    <input id="input1" onclick="py.boo" value="123"/>
+</div>
+<py-script src="app.py"></py-script>
+</body>
+</html>
